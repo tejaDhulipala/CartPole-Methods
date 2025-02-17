@@ -7,4 +7,4 @@ class Agent:
         self.action_size = action_space_size
     
     def action(self, observation: ndarray):
-        return np.random.choice(np.arange(self.observation_size))
+        return int(np.random.choice(np.arange(self.action_size)))

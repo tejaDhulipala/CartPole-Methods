@@ -9,9 +9,11 @@ class Recorder:
         self.agent = agent
         self.discount_factor = discount
 
-    def record_one_episode(self, last_episode=True, custom_reward = False):
+    def record_one_episode(self, last_episode=True, custom_reward = False, episode_limit=-1):
         """
         Records one episode
+
+        Episode limit is the maximum number of episodes that can be run. If it's -1, it'll stop when truncated.
 
         Returns a tuple in the form:
         (array of [(state, action, reward)], total return)
@@ -32,7 +34,10 @@ class Recorder:
             return_value += reward * discount
             discount *= self.discount_factor
 
-            if terminated or truncated:
+            if terminated:
+                running = False
+            if (len(episode) > episode_limit and episode_limit > 0) or (episode_limit < 0 and truncated):
+                print("EPISODE TRUNCATED")
                 running = False
         
         if last_episode:
@@ -40,12 +45,12 @@ class Recorder:
 
         return (episode, return_value)
 
-    def record_episodes(self, N: int, custom_reward=False):
+    def record_episodes(self, N: int, custom_reward=False, epsode_limit=-1):
         """
         records N episodes to self.recording
         """
         for i in range(N):
-            self.recording.append(self.record_one_episode(last_episode=(i==N-1), custom_reward=custom_reward))
+            self.recording.append(self.record_one_episode(last_episode=(i==N-1), custom_reward=custom_reward, episode_limit=epsode_limit))
     
     def reset(self):
         self.__init__(self.env, self.agent, discount=self.discount_factor)
